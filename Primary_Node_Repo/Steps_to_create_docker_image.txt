@@ -1,0 +1,62 @@
+# Instructions to create and load a docker image on the primary node and then build the same image on the other secondary nodes
+
+1. Create a new working directory
+mkdir OPT_primary_node
+ 
+2. Clone the github repo  
+cd OPT_primary_node
+git clone https://github.com/vivekkhatana/RpiClusterOPT.git
+
+3. Check if docker is installed on Raspberry Pi (if not installed first install the docker)
+docker version
+
+else:(https://www.ionos.com/digitalguide/server/configuration/docker-on-raspberry-pi/)
+./installDocker.sh  
+or 
+curl -fsSL https://get.docker.com | sh
+docker run armhf/hello-world
+
+
+4. Create and load a new dockerFile/dockerContainer on the primary node (pc0)
+# Pull Python Base Image
+FROM arm32v7/python:3
+
+
+# Copy the folder containg codes for the secondary node
+COPY Secondary_Node_Repo ./
+
+# Define default command
+CMD ["python", "./secondary_node_v2.py"]
+
+
+5. Build and save the docker image
+sudo ls -la /var/run/docker.sock
+sudo chown picocluster:docker /var/run/docker.sock
+
+docker build -t secondary_node_app .
+docker image ls
+docker save (image_file_name) > (filemane2).tar
+
+
+6. Send the dockerFile/dockerContainer to all the secondary nodes and check if all the nodes receive it
+
+To give file permission: chmod u+x (sriptname).sh
+
+./sendDockerImageToEachNode.sh
+./checkDockerOnEachNode.sh
+
+
+
+7. Build the dockerFile/dockerContainer in all the secondary nodes
+./startDockerOnEachNode.sh
+
+
+
+8. Test if the docker Container is properly installed and the app is working
+docker image ls
+
+
+
+
+
+
